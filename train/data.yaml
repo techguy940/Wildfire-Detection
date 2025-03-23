@@ -1,0 +1,9 @@
+# data.yaml
+train: train/images
+val: val/images
+
+# Number of classes (e.g., fire and smoke)
+nc: 2
+
+# Class names (ensure the order matches the annotation labels)
+names: ['smoke', 'fire']
