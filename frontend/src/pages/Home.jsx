@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
-const Home = () => {
+const FireAndSmokeDetection = () => {
   const [originalImage, setOriginalImage] = useState(null);
+  const [detectedImage, setDetectedImage] = useState(null);
 
   const previewOriginal = (e) => {
     const file = e.target.files[0];
@@ -11,12 +12,31 @@ const Home = () => {
   };
 
   const uploadImage = async () => {
-   //code here
-    alert("File uploaded successfully");
-
     const fileInput = document.getElementById("imageInput");
-    fileInput.value = ""; 
-    
+    if (fileInput.files.length === 0) {
+      alert("Please select an image.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      const response = await fetch("http://localhost:8000/detect", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process image");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setDetectedImage(url);
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
   };
 
   return (
@@ -36,8 +56,31 @@ const Home = () => {
       <button onClick={uploadImage}>
         Detect
       </button>
+
+      <div>
+        <div>
+          <h3>Original Image</h3>
+          {originalImage && (
+            <img
+              id="original"
+              src={originalImage}
+              alt="Original Image"
+            />
+          )}
+        </div>
+        <div>
+          <h3>Detected Image</h3>
+          {detectedImage && (
+            <img
+              id="detected"
+              src={detectedImage}
+              alt="Detected Image"
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Home;
+export default FireAndSmokeDetection;
